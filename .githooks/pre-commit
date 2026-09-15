@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -eu
+
+unstage_on_failure() {
+    status=$?
+
+    if [ "$status" -ne 0 ]; then
+        echo >&2
+        echo "pre-commit checks failed; staged changes were moved back to the working tree." >&2
+        git reset --quiet
+    fi
+
+    exit "$status"
+}
+
+trap unstage_on_failure EXIT
+
+echo "Checking formatting..."
+cargo fmt --check
+
+echo "Running Clippy..."
+cargo clippy --all-targets --all-features -- -D warnings
+
+echo "Running tests..."
+cargo test --all-targets --all-features
+
+trap - EXIT
+echo "All pre-commit checks passed."

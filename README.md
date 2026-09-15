@@ -69,3 +69,23 @@ Reader の読み込みでは、I/O エラーも表現できる `LoadError` を�
 ```console
 cargo test
 ```
+
+## pre-commit チェック
+
+このリポジトリをクローンした後、次のコマンドで Git フックを有効化します。
+
+```console
+git config core.hooksPath .githooks
+```
+
+コミット前に、次のチェックが自動実行されます。
+
+```console
+cargo fmt --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets --all-features
+```
+
+いずれかが失敗するとコミットは中止され、ステージ済みの変更は
+`git reset` によって作業ツリーへ戻されます。修正後、もう一度
+`git add` と `git commit` を実行してください。
